@@ -1,0 +1,10 @@
+<mat-toolbar color="primary">
+    <span>Leave Management</span>
+    <span class="spacer"></span>
+    <button mat-button routerLink="/leave/dashboard" *ngIf="isLoggedIn">Dashboard</button>
+    <button mat-button routerLink="/leave/apply" *ngIf="isLoggedIn">Apply Leave</button>
+    <button mat-button routerLink="/admin/dashboard" *ngIf="isLoggedIn && isAdmin">Admin</button>
+    <button mat-button (click)="logout()" *ngIf="isLoggedIn">Logout</button>
+    <button mat-button routerLink="/login" *ngIf="!isLoggedIn">Login</button>
+    <button mat-button routerLink="/register" *ngIf="!isLoggedIn">Register</button>
+  </mat-toolbar>
