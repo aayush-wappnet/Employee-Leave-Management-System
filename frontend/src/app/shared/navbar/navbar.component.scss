@@ -1,3 +1,22 @@
-.spacer {
+
+  mat-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+  }
+  
+  .spacer {
     flex: 1 1 auto;
+  }
+  
+  button[mat-button] {
+    margin: 0 8px; // Add spacing between buttons
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1); // Subtle hover effect
+    }
   }

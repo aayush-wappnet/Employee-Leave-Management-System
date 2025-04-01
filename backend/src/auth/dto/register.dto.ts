@@ -1,4 +1,4 @@
-import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsEmail, MinLength, MaxLength, IsOptional, IsEnum } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -11,4 +11,8 @@ export class RegisterDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @IsOptional()
+  @IsEnum(['employee', 'admin'])
+  role?: string; // Optional, defaults to 'employee' in UserService
 }

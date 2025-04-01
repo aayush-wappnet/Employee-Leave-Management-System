@@ -4,6 +4,13 @@ import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 
+// Define the type for the JWT payload
+interface JwtUser {
+  userId: number;
+  email: string;
+  role: string;
+}
+
 @Controller('leave')
 @UseGuards(JwtAuthGuard)
 export class LeaveController {
@@ -12,26 +19,26 @@ export class LeaveController {
   constructor(private leaveService: LeaveService) {}
 
   @Post()
-  create(@Body() createLeaveDto: CreateLeaveDto, @Request() req) {
-    this.logger.log(`POST /api/leave called with data: ${JSON.stringify(createLeaveDto)} by user: ${req.user.id}`);
+  create(@Body() createLeaveDto: CreateLeaveDto, @Request() req: { user: JwtUser }) {
+    this.logger.log(`POST /api/leave called with data: ${JSON.stringify(createLeaveDto)} by user: ${req.user.userId}`);
     return this.leaveService.createLeave(createLeaveDto, req.user);
   }
 
   @Get()
-  getLeaves(@Request() req) {
-    this.logger.log(`GET /api/leave called by user: ${req.user.id}`);
+  getLeaves(@Request() req: { user: JwtUser }) {
+    this.logger.log(`GET /api/leave called by user: ${req.user.userId} with role: ${req.user.role}`);
     return this.leaveService.getLeaves(req.user);
   }
 
   @Get('all')
-  getAllLeaves(@Request() req) {
-    this.logger.log(`GET /api/leave/all called by user: ${req.user.id}`);
+  getAllLeaves(@Request() req: { user: JwtUser }) {
+    this.logger.log(`GET /api/leave/all called by user: ${req.user.userId} with role: ${req.user.role}`);
     return this.leaveService.getAllLeaves(req.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLeaveDto: UpdateLeaveDto, @Request() req) {
-    this.logger.log(`PATCH /api/leave/${id} called with data: ${JSON.stringify(updateLeaveDto)} by user: ${req.user.id}`);
+  @Patch('all/:id')
+  update(@Param('id') id: string, @Body() updateLeaveDto: UpdateLeaveDto, @Request() req: { user: JwtUser }) {
+    this.logger.log(`PATCH /api/leave/${id} called with data: ${JSON.stringify(updateLeaveDto)} by user: ${req.user.userId}`);
     return this.leaveService.updateLeave(+id, updateLeaveDto, req.user);
   }
 }

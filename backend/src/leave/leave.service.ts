@@ -5,14 +5,21 @@ import { UpdateLeaveDto } from './dto/update-leave.dto';
 import { Leave } from './leave.entity';
 import { User } from '../user/user.entity';
 
+// Define the type for the JWT payload
+interface JwtUser {
+  userId: number;
+  email: string;
+  role: string;
+}
+
 @Injectable()
 export class LeaveService {
   private readonly logger = new Logger(LeaveService.name);
 
   constructor(private leaveRepository: LeaveRepository) {}
 
-  async createLeave(createLeaveDto: CreateLeaveDto, user: User): Promise<Leave> {
-    this.logger.log(`Creating leave for user ${user.id} with data: ${JSON.stringify(createLeaveDto)}`);
+  async createLeave(createLeaveDto: CreateLeaveDto, user: JwtUser): Promise<Leave> {
+    this.logger.log(`Creating leave for user ${user.userId} with role ${user.role}, data: ${JSON.stringify(createLeaveDto)}`);
 
     const leave = this.leaveRepository.create({
       employeeName: createLeaveDto.employeeName,
@@ -20,11 +27,11 @@ export class LeaveService {
       startDate: new Date(createLeaveDto.startDate),
       endDate: new Date(createLeaveDto.endDate),
       approvalStatus: 'Pending',
-      user, // Set the user relation directly
+      user: { id: user.userId } as User, // Map userId from JWT to User entity's id
     });
 
     try {
-      const savedLeave = await this.leaveRepository.save(leave, { reload: false });
+      const savedLeave = await this.leaveRepository.save(leave);
       this.logger.log(`Leave created with ID: ${savedLeave.id}, userId: ${savedLeave.user.id}`);
       return savedLeave;
     } catch (error) {
@@ -33,18 +40,20 @@ export class LeaveService {
     }
   }
 
-  async getLeaves(user: User): Promise<Leave[]> {
-    return this.leaveRepository.findByUserId(user.id);
+  async getLeaves(user: JwtUser): Promise<Leave[]> {
+    this.logger.log(`Fetching leaves for user ${user.userId} with role ${user.role}`);
+    return this.leaveRepository.find({ where: { user: { id: user.userId } } });
   }
 
-  async getAllLeaves(user: User): Promise<Leave[]> {
+  async getAllLeaves(user: JwtUser): Promise<Leave[]> {
+    this.logger.log(`Fetching all leaves requested by user ${user.userId} with role ${user.role}`);
     if (user.role !== 'admin') {
       throw new ForbiddenException('Only admins can view all leaves');
     }
     return this.leaveRepository.find();
   }
 
-  async updateLeave(id: number, updateLeaveDto: UpdateLeaveDto, user: User): Promise<Leave> {
+  async updateLeave(id: number, updateLeaveDto: UpdateLeaveDto, user: JwtUser): Promise<Leave> {
     if (user.role !== 'admin') {
       throw new ForbiddenException('Only admins can update leave status');
     }

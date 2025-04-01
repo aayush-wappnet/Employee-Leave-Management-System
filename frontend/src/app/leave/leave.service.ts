@@ -7,7 +7,9 @@ import { AuthService } from '../auth/auth.service';
   providedIn: 'root',
 })
 export class LeaveService {
-  private apiUrl = 'http://localhost:8000/api/leave';
+  private apiUrl = 'http://localhost:8000/api/leave/all';
+  private apiUrlForUser = 'http://localhost:8000/api/leave'; // Use this for applying and getting leaves
+  
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -18,15 +20,15 @@ export class LeaveService {
   }
 
   applyLeave(leave: any): Observable<any> {
-    return this.http.post(this.apiUrl, leave, { headers: this.getHeaders() });
+    return this.http.post(this.apiUrlForUser, leave, { headers: this.getHeaders() });
   }
 
   getLeaves(): Observable<any> {
-    return this.http.get(this.apiUrl, { headers: this.getHeaders() });
+    return this.http.get(this.apiUrlForUser, { headers: this.getHeaders() });
   }
 
   getAllLeaves(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/all`, { headers: this.getHeaders() });
+    return this.http.get(`${this.apiUrl}`, { headers: this.getHeaders() });
   }
 
   updateLeave(id: number, status: string): Observable<any> {

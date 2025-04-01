@@ -21,7 +21,11 @@ export class Leave {
   @Column({ type: 'enum', enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' })
   approvalStatus: string;
 
-  @ManyToOne(() => User, (user) => user.leaves, { eager: false, onUpdate: 'NO ACTION' })
-  @JoinColumn({ name: 'userId' }) // This defines userId as the foreign key column
+
+  @ManyToOne(() => User, (user) => user.leaves, { nullable: false, onUpdate: 'NO ACTION' })
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column()
+  userId: number; // Added userId column for foreign key reference
 }
